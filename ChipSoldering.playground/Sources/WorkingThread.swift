@@ -41,7 +41,7 @@ public class WorkingThread: Thread {
             // Дожидаемся новой партии чипов
             main()
         } else {
-            print("Работу закончил")
+            printResultsReport()
         }
         
     }
@@ -71,5 +71,10 @@ extension WorkingThread {
     private enum OperationType: String {
         case getFromStorage = "выдача со склада"
         case soldering = "пайка"
+    }
+    
+    private func printResultsReport() {
+        print("Работа закончена. Распаяно за смену — \(counter) чипов.")
+        print("\n")
     }
 }
