@@ -19,6 +19,7 @@ public class GenerationThread: Thread {
         if let timer = timer {
             RunLoop.current.add(timer, forMode: .common)
             RunLoop.current.run(until: .now + 20)
+            storage.isWaitingForNewChips = false
         }
     }
     
