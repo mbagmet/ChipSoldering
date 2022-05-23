@@ -4,6 +4,8 @@ public class Storage {
     private var chipStorage = [Chip]()
     private let queue = DispatchQueue(label: "Storage Queue", qos: .utility, attributes: .concurrent)
     
+    public var isWaitingForNewChips = true
+    
     public var chipsInStorageQuantity: Int {
         return chipStorage.count
     }

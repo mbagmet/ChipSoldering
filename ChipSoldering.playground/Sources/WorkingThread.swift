@@ -12,43 +12,50 @@ public class WorkingThread: Thread {
     
     public override func main() {
 
-        condition.lock()
-        
-        // Ждем, пока на складе появится хотя бы один чип
-        while storage.chipsInStorageQuantity <= 0 {
-            condition.wait()
-        }
+        if storage.isWaitingForNewChips {
+            condition.lock()
             
-        while storage.chipsInStorageQuantity > 0 {
-            var chipForsoldering: Chip?
-            
-            // Берем чип со склада
-            storage.getFromStorage() { chip in
-                chipForsoldering = chip
-                self.printReport(chip: chip, type: .getFromStorage)
+            // Ждем, пока на складе появится хотя бы один чип
+            while storage.chipsInStorageQuantity <= 0 {
+                condition.wait()
             }
-            
-            // Распаиваем чип
-            if let chip = chipForsoldering {
-                chip.sodering()
-                printReport(chip: chip, type: .soldering)
+                
+            while storage.chipsInStorageQuantity > 0 {
+                var chipForsoldering: Chip?
+                
+                // Берем чип со склада
+                storage.getFromStorage() { chip in
+                    chipForsoldering = chip
+                    self.stageNumberCount()
+                    self.printReport(chip: chip, type: .getFromStorage)
+                }
+                
+                // Распаиваем чип
+                if let chip = chipForsoldering {
+                    chip.sodering()
+                    printReport(chip: chip, type: .soldering)
+                }
             }
-        }
+                
+            condition.unlock()
             
-        condition.unlock()
+            // Дожидаемся новой партии чипов
+            main()
+        } else {
+            printResultsReport()
+        }
         
-        // Дожидаемся новой партии чипов
-        main()
     }
 }
 
 // MARK: - Вывод отчетов
 extension WorkingThread {
+    private func stageNumberCount() {
+        counter += 1
+    }
+    
     private func printReport(chip: Chip?, type: OperationType) {
         if let chip = chip {
-            if type == .getFromStorage {
-                counter += 1
-            }
             print("#\(counter) - \(type.rawValue)")
             
             switch type {
@@ -66,5 +73,10 @@ extension WorkingThread {
     private enum OperationType: String {
         case getFromStorage = "выдача со склада"
         case soldering = "пайка"
+    }
+    
+    private func printResultsReport() {
+        print("Работа закончена. Распаяно за смену — \(counter) чипов.")
+        print("\n")
     }
 }
