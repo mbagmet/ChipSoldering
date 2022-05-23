@@ -26,6 +26,7 @@ public class WorkingThread: Thread {
                 // Берем чип со склада
                 storage.getFromStorage() { chip in
                     chipForsoldering = chip
+                    self.stageNumberCount()
                     self.printReport(chip: chip, type: .getFromStorage)
                 }
                 
@@ -49,11 +50,12 @@ public class WorkingThread: Thread {
 
 // MARK: - Вывод отчетов
 extension WorkingThread {
+    private func stageNumberCount() {
+        counter += 1
+    }
+    
     private func printReport(chip: Chip?, type: OperationType) {
         if let chip = chip {
-            if type == .getFromStorage {
-                counter += 1
-            }
             print("#\(counter) - \(type.rawValue)")
             
             switch type {

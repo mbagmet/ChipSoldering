@@ -27,6 +27,7 @@ public class GenerationThread: Thread {
     @objc func startGeneration() {
         let chip = Chip.make()
         storage.appendStorage(chip: chip) {
+            self.stageNumberCount()
             self.printReport(chip: chip)
             self.signal()
         }
@@ -42,8 +43,11 @@ public class GenerationThread: Thread {
 
 // MARK: - Вывод отчетов
 extension GenerationThread {
-    private func printReport(chip: Chip) {
+    private func stageNumberCount() {
         counter += 1
+    }
+    
+    private func printReport(chip: Chip) {
         print("#\(counter) - генерация")
         print("Добавлен на склад чип типа \"\(chip.chipType)\"")
         print("Количество чипов на складе — \(self.storage.chipsInStorageQuantity)")
